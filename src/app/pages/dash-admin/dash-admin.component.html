@@ -1,0 +1,55 @@
+<div class="main-container">
+
+<nav class="main-menu " (mouseenter)="expandMenu()" (mouseleave)="collapseMenu()">
+            <a>
+                <i class="bi bi-person-circle"></i><br>
+                <span class="nav-text">
+                    Admin
+                </span>
+            </a>
+    <hr>
+
+    <ul>
+        <li>
+            <a (click)="setView('home')">
+                <i class="bi bi-house-door-fill"></i>
+                <span class="nav-text">
+                   Accueil
+                </span>
+            </a>
+        </li>
+        <li class="has-subnav">
+            <a (click)="setView('rapport')">
+                <i class="bi bi-bar-chart-line-fill"></i>
+                <span class="nav-text">
+                    Rapport 
+                </span>
+            </a>
+            
+        </li>
+        <li class="has-subnav">
+            <a (click)="setView('users')">
+                <i class="bi bi-people-fill"></i>
+                <span class="nav-text">
+                    Utilisateurs
+                </span>
+            </a> 
+        </li> 
+    </ul>
+
+    <ul class="logout">
+        <li>
+           <a (click)="onLogout()">
+                 <i class="fa fa-power-off fa-2x"></i>
+                <span class="nav-text">
+                    Déconnexion
+                </span>
+            </a>
+        </li>  
+    </ul>
+</nav>
+<div class="content-container">
+    <app-search-bar (search)="onSearch($event)"></app-search-bar>
+    <app-main-contenu [currentView]="currentView"></app-main-contenu>
+  </div>
+</div>

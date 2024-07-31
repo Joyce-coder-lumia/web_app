@@ -1,0 +1,237 @@
+<nav class="main-menu">
+  <ul>
+      <li>
+          <a href="javascript:void(0);">
+              <input type="file" (change)="uploadFile($event)" hidden #fileInput>
+              <i class="bi bi-person-circle" (click)="fileInput.click()"></i>
+          </a>
+          <img *ngIf="imageUrl" [src]="imageUrl" class="profile-image-preview"/>
+      </li>
+  </ul> 
+  <hr>
+  <ul>
+      <li>
+          <a href="javascript:void(0)" (click)="openTab('listepatients')">
+              <i class="bi bi-people-fill"></i>
+              <span class="nav-text">Patients</span>
+          </a>
+      </li>
+      <li class="has-subnav">
+          <a href="javascript:void(0)" (click)="openTab('dispo')">
+              <i class="bi bi-calendar-plus-fill"></i>
+              <span class="nav-text">Disponibilités</span>
+          </a>
+      </li>
+      <li class="has-subnav">
+          <a href="javascript:void(0)" (click)="openTab('Planning')">
+              <i class="bi bi-journal-text"></i>
+              <span class="nav-text">Planning</span>
+          </a>
+      </li>
+      <li class="has-subnav">
+          <a href="javascript:void(0)" (click)="openTab('notifications')">
+              <i class="bi bi-bell-fill"></i>
+              <span class="nav-text">Notifications</span>
+          </a>
+      </li> 
+  </ul>
+  <ul class="logout">
+      <li>
+          <a (click)="onLogout()">
+              <i class="fa fa-power-off fa-2x"></i>
+              <span class="nav-text">Déconnexion</span>
+          </a>
+      </li>  
+  </ul>
+</nav>
+
+<div class="container-doc" *ngIf="activeTab === 'dispo'">
+  <form [formGroup]="doctorDetailsForm" (ngSubmit)="onSubmit()">
+      <div class="form-group">
+          <label>Jours de travail</label>
+          <div formArrayName="joursTravail">
+              <div *ngFor="let day of joursTravailArray.controls; let i = index">
+                  <input type="checkbox" [formControlName]="i"> {{ daysOfWeek[i] }}
+              </div>
+          </div>
+      </div>
+      <div class="form-group">
+          <label for="heuresDebut">Heure de début</label>
+          <input formControlName="heuresDebut" class="form-control" type="time">
+      </div>
+      <div class="form-group">
+          <label for="heuresFin">Heure de fin</label>
+          <input formControlName="heuresFin" class="form-control" type="time">
+      </div>
+      <div class="form-group">
+          <label for="description">Description</label>
+          <textarea formControlName="description" class="form-control"></textarea>
+      </div>
+      <button type="submit" class="btn btn-primary" [disabled]="!doctorDetailsForm.valid">Mettre à jour</button>
+  </form>
+</div>
+
+<div class="table-container" *ngIf="activeTab === 'listepatients'">
+  <table class="table caption-top">
+      <caption>Liste des Rendez-vous</caption>
+      <thead>
+          <tr>
+              <th scope="col">Nom</th>
+              <th scope="col">Prenom</th>
+              <th scope="col">Consultation</th>
+              <th scope="col">Commentaire d'annulation</th>
+              <th scope="col"></th>
+          </tr>
+      </thead>
+      <tbody class="table-group-divider">
+          <tr *ngFor="let patient of paginatedPatients">
+              <td>{{ patient.patientName}}</td>
+              <td>{{ patient.patientPrenom }}</td>
+              <td>{{ patient.date_heure | date: 'short' }}</td>
+              <td>{{ patient.annulation_commentaire }}</td>
+              <td>
+                <div class="action-buttons">
+                  <button class="btn btn-danger" (click)="onCancel(patient._id)">Annuler</button>
+                  <button class="btn btn-success" (click)="onConfirme(patient._id)">Confirmer</button>
+                  <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#rescheduleModal" (click)="openRescheduleModal(patient._id)">Décaler</button>
+                  <button class="btn btn-warning" (click)="openConsultationModal(patient._id)">Consultation</button>
+                  <i class="bi bi-journals" #journalModal (click)="openJournalModal(patient._id)" style="color: #CE50FF;"></i>
+                </div>
+              </td>
+          </tr>
+      </tbody>
+  </table>
+  <div class="pagination-container" *ngIf="totalPages > 1">
+      <nav aria-label="Pagination">
+          <ul class="pagination">
+              <li class="page-item" [class.disabled]="currentPage === 1">
+                  <button class="page-link" (click)="previousPage()" [disabled]="currentPage === 1">Previous</button>
+              </li>
+              <li *ngFor="let page of pages" class="page-item" [class.active]="page === currentPage">
+                  <button class="page-link" (click)="goToPage(page)">{{ page }}</button>
+              </li>
+              <li class="page-item" [class.disabled]="currentPage === totalPages">
+                  <button class="page-link" (click)="nextPage()" [disabled]="currentPage === totalPages">Next</button>
+              </li>
+          </ul>
+      </nav>
+      <p *ngIf="totalPages <= 1">Tous les rendez-vous sont affichés sur une seule page.</p>
+  </div>
+</div>
+
+<div class="modal fade" id="rescheduleModal" tabindex="-1" aria-labelledby="rescheduleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+      <div class="modal-content">
+          <div class="modal-header">
+              <h5 class="modal-title" id="rescheduleModalLabel">Décaler le Rendez-vous</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+              <form [formGroup]="rescheduleForm">
+                  <div class="mb-3">
+                      <label for="newDate" class="form-label">Nouvelle Date</label>
+                      <input type="date" id="newDate" formControlName="newDate" class="form-control">
+                  </div>
+                  <div class="mb-3">
+                      <label for="newStartTime" class="form-label">Nouvelle Heure de Début</label>
+                      <input type="time" id="newStartTime" formControlName="newStartTime" class="form-control">
+                  </div>
+                  <div class="mb-3">
+                      <label for="newEndTime" class="form-label">Nouvelle Heure de Fin</label>
+                      <input type="time" id="newEndTime" formControlName="newEndTime" class="form-control">
+                  </div>
+              </form>
+          </div>
+          <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+              <button type="button" class="btn btn-primary" (click)="rescheduleAppointment()">Enregistrer les modifications</button>
+          </div>
+      </div>
+  </div>
+</div>
+
+<!-- Modal pour ajouter une consultation -->
+<div class="modal fade" #consultationModal id="consultationModal" tabindex="-1" aria-labelledby="consultationModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+      <div class="modal-content">
+          <div class="modal-header">
+              <h5 class="modal-title" id="consultationModalLabel">Ajouter une consultation</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+              <form [formGroup]="consultationForm">
+                  <div class="mb-3">
+                      <label for="diagnostics" class="form-label">Diagnostics</label>
+                      <input id="diagnostics" formControlName="diagnostics" class="form-control">
+                  </div>
+                  <div class="mb-3">
+                      <label for="prescriptions" class="form-label">Prescriptions</label>
+                      <input id="prescriptions" formControlName="prescriptions" class="form-control">
+                  </div>
+                  <div class="mb-3">
+                      <label for="advice" class="form-label">Conseils</label>
+                      <input id="advice" formControlName="advice" class="form-control">
+                  </div>
+                  <div class="mb-3">
+                      <label for="additional_notes" class="form-label">Notes supplémentaires</label>
+                      <input id="additional_notes" formControlName="additional_notes" class="form-control">
+                  </div>
+              </form>
+          </div>
+          <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+              <button type="button" class="btn btn-primary" (click)="onSubmitConsultation()">Enregistrer</button>
+          </div>
+      </div>
+  </div>
+</div>
+
+<!-- Journal Modal -->
+<div class="modal fade" #journalModal id="journalModal" tabindex="-1" aria-labelledby="journalModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+      <div class="modal-content">
+          <div class="modal-header">
+              <h5 class="modal-title" id="journalModalLabel">Journal du Patient</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+              <p *ngFor="let entry of journalEntries">{{ entry.date }}: {{ entry.entry }}</p>
+          </div>
+          <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+              <i class="bi bi-download" (click)="downloadJournal()"></i>
+          </div>
+      </div>
+  </div>
+</div>
+
+<!--affichage du planning docteur-->
+<div class="table-container" *ngIf="activeTab === 'Planning'">
+  <table class="table caption-top">
+      <caption>Planning de Travail</caption>
+      <thead>
+          <tr>
+              <th scope="col">Jour</th>
+              <th scope="col">Heure de Début</th>
+              <th scope="col">Heure de Fin</th>
+          </tr>
+      </thead>
+      <tbody class="table-group-divider">
+          <tr *ngFor="let day of workingDays">
+              <td>{{ day }}</td>
+              <td>{{ doctorInfo.heuresDebut }}</td>
+              <td>{{ doctorInfo.heuresFin }}</td>
+          </tr>
+      </tbody>
+  </table>
+</div>
+
+<div class="notification-container" *ngIf="activeTab === 'notifications'">
+  <h2>Notifications</h2>
+  <ul>
+      <li *ngFor="let notification of notifications" class="notification-item">
+          <span class="notification-title">{{ notification.title }}</span>
+          <span class="notification-message">{{ notification.message }}</span>
+      </li>
+  </ul>
+</div>

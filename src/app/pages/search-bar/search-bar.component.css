@@ -1,0 +1,54 @@
+.containerSearch {
+    margin-left: 30px; /* Par défaut lorsque le menu est réduit */
+    margin-right: 15px;
+    margin-top: 20px;
+    position: relative;
+    
+}
+.main-menu.expanded ~ .content-container .containerSearch {
+    margin-left: 270px; /* Lorsque le menu est étendu */
+}
+
+.containerSearch .form-control.search {
+    flex-grow: 1;
+    background-color: transparent;
+    border: none; 
+    color: white; 
+    height: 100%;
+    width: 100%; 
+    padding-right: 40px; 
+    border-radius: 30px;
+}
+.containerSearch button {
+    position: absolute; 
+    right: 0; 
+    top: 50%;
+    transform: translateY(-50%);
+    height: 40px; 
+    border-radius: 30px;
+    margin-right: 15px;
+    background-color: #d17ad1; 
+    border: none; 
+    color: white; 
+    padding: 0 15px; 
+}  
+.containerSearch form {
+    display: flex;
+    align-items: center; 
+    overflow: hidden; 
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); 
+    border-radius: 30px;
+    background-color: #4b29e2;
+    height: 50px;
+}  
+
+
+
+
+
+
+
+
+
+  
+  

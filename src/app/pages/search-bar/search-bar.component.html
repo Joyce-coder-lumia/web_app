@@ -1,0 +1,8 @@
+<div class="containerSearch">
+    <form class="d-flex" (submit)="onSearch(searchInput.value); $event.preventDefault()">
+        <input #searchInput class="form-control search" type="search" placeholder="Rechercher..." (input)="onSearch(searchInput.value)">
+        <button type="submit"><i class="bi bi-search"></i></button>
+
+    </form>
+
+</div>

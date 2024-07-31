@@ -1,0 +1,230 @@
+<div *ngIf="currentView === 'home'">
+  <!-- Contenu de la vue Accueil -->
+  <div class="home-container">
+    <table class="table caption-top" >
+      <thead>
+      <tr>
+          <th scope="col">Activite effectue</th>
+          <th scope="col">Details</th>
+          <th scope="col">Date</th>
+
+          <th scope="col"></th>
+      </tr>
+      </thead>
+      <tbody class="table-group-divider">
+            <tr *ngFor="let activity of paginatedActivities">
+
+              <td> {{ activity.action }} </td>
+              <td> {{ activity.details }} </td>
+              <td> {{ activity.timestamp | date:'short' }} </td>   
+          </tr> 
+      </tbody>
+  </table> 
+  <nav *ngIf="totalActivityPages > 1" aria-label="Pagination">
+    <ul class="pagination">
+      <li class="page-item" [class.disabled]="currentActivityPage === 1">
+        <button class="page-link" (click)="previousActivityPage()" [disabled]="currentActivityPage === 1">Previous</button>
+      </li>
+      <li *ngFor="let page of totalActivityPagesArray" class="page-item" [class.active]="page === currentActivityPage">
+        <button class="page-link" (click)="goToActivityPage(page)">{{ page }}</button>
+      </li>
+      <li class="page-item" [class.disabled]="currentActivityPage === totalActivityPages">
+        <button class="page-link" (click)="nextActivityPage()" [disabled]="currentActivityPage === totalActivityPages">Next</button>
+      </li>
+    </ul>
+  </nav> 
+  </div>
+</div>
+
+<div *ngIf="currentView === 'rapport'">
+  <!-- Contenu de la vue Rapport -->
+  <div class="rapport-container">
+    
+   
+  </div>
+       
+
+  
+</div>
+
+
+<div *ngIf="currentView === 'users'">
+<div class="container container-custom mt-4">
+  <div class="row justify-content-center">
+    <div class="col-md-4" *ngFor="let role of roles">
+      <div class="card card-custom text-center">
+        <div class="card-body">
+          <div class="d-flex align-items-center justify-content-center mb-3">
+            <i class="bi icon-custom" [ngClass]="getIconClass(role)"></i>
+          </div>
+          <h5 class="card-custom-title">{{ roleCounts[role] || 0 }}</h5>
+          <p class="card-custom-text">{{ role.toUpperCase() }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- affichage des utilsateurs-->
+<div  class="table-container">
+  <div class="table-title-container">
+    <h4 class="table-title">Liste des utilisateurs</h4>
+    <!-- Button pour ouvrir la modale -->
+    <button type="button" class="btn btn-primary btn-new-user" data-bs-toggle="modal" data-bs-target="#exampleModal">
+    <i class="bi bi-person-plus-fill"></i> Nouveau
+    </button>
+  </div>
+  <table class="table caption-top" >
+
+      <thead>
+      <tr>
+          <th scope="col">Nom</th>
+          <th scope="col">Email</th>
+          <th scope="col">Role</th>
+
+          <th scope="col"></th>
+      </tr>
+      </thead>
+      <tbody class="table-group-divider">
+          <!--<tr *ngFor="let utilisateur of utilisateurs">-->
+            <tr *ngFor="let utilisateur of  paginatedUsers">
+
+              <td>{{ utilisateur.nom }} {{ utilisateur.prenom }}</td>
+              <td>{{ utilisateur.email }}</td>
+              <td>{{ utilisateur.role }}</td>
+              <td>
+                <i class="bi bi-pencil-fill icon-pencil" data-bs-toggle="modal" data-bs-target="#editModal" (click)="editUser(utilisateur)" ></i>
+                <i class="bi bi-trash3-fill icon-trash" (click)="deleteUser(utilisateur.uid)"></i> 
+              </td>   
+          </tr> 
+      </tbody>
+  </table>
+  <nav *ngIf="totalPages > 1" aria-label="Pagination">
+    <ul class="pagination">
+      <li class="page-item" [class.disabled]="currentPage === 1">
+        <button class="page-link" (click)="previousPage()" [disabled]="currentPage === 1">Previous</button>
+      </li>
+      <li *ngFor="let page of totalPagesArray" class="page-item" [class.active]="page === currentPage">
+        <button class="page-link" (click)="goToPage(page)">{{ page }}</button>
+      </li>
+      <li class="page-item" [class.disabled]="currentPage === totalPages">
+        <button class="page-link" (click)="nextPage()" [disabled]="currentPage === totalPages">Next</button>
+      </li>
+    </ul>
+  </nav>
+</div>
+
+</div>
+
+
+
+
+
+
+
+<!-- Modale -->
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Formulaire d'inscription</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form #userForm="ngForm" (ngSubmit)="register(userForm)">
+          <div class="mb-3">
+              <input type="text" class="form-control" name="nom" [(ngModel)]="user.nom" placeholder=" Nom">  
+          </div>
+          <div class="mb-3">
+            <input type="text" class="form-control" name="prenom" [(ngModel)]="user.prenom" placeholder="Prénom">
+          </div> 
+          <div class="mb-3">
+              <input type="date" class="form-control" name="dateNaissance" [(ngModel)]="user.dateNaissance"  placeholder="dateNaissance">
+            </div>
+          <div class="mb-3">
+            <input type="email" class="form-control" name="email" [(ngModel)]="user.email" placeholder="Email">
+          </div>
+
+          <div class="mb-3">
+              <input type="password" class="form-control" name="password" [(ngModel)]="user.password" placeholder="Mot de passe">
+          </div>
+          <div class="mb-3">
+            <input type="tel" class="form-control" name="phoneNumber" [(ngModel)]="user.phoneNumber" placeholder="Téléphone">
+          </div>
+          <div class="mb-3">
+            <select class="form-control" name="role" [(ngModel)]="user.role">
+              <option value="">Sélectionnez un rôle</option>
+              <option value="admin">Admin</option>
+              <option value="secretaire">Secrétaire</option>
+              <option value="Docteur">Docteur</option>
+            </select>
+          </div>
+          <div class="mb-3" *ngIf="user.role === 'Docteur'">
+              <input type="text" class="form-control" name="specialite" [(ngModel)]="user.specialite" placeholder="Spécialité">
+          </div>
+
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+            <button type="submit" class="btn btn-primary" >Sauvegarder</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+
+<!-- Modale de modification -->
+<div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="editModalLabel">Modifier l'utilisateur</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form #editForm="ngForm" (ngSubmit)="updateUser()">
+          <div class="mb-3">
+            <input type="text" class="form-control" name="nom" [(ngModel)]="selectedUser.nom" placeholder="Nom">
+          </div>
+          <div class="mb-3">
+            <input type="text" class="form-control" name="prenom" [(ngModel)]="selectedUser.prenom" placeholder="Prénom">
+          </div>
+          <div class="mb-3">
+            <input type="date" class="form-control" name="dateNaissance" [(ngModel)]="selectedUser.dateNaissance" placeholder="dateNaissance">
+          </div>
+          <div class="mb-3">
+            <input type="email" class="form-control" name="email" [(ngModel)]="selectedUser.email" placeholder="Email" disabled>
+          </div>
+          <div class="mb-3">
+            <input type="tel" class="form-control" name="phoneNumber" [(ngModel)]="selectedUser.phoneNumber" placeholder="Téléphone">
+          </div>
+          <div class="mb-3">
+            <select class="form-control" name="role" [(ngModel)]="selectedUser.role">
+              <option value="">Sélectionnez un rôle</option>
+              <option value="admin">Admin</option>
+              <option value="secretaire">Secrétaire</option>
+              <option value="Docteur">Docteur</option>
+            </select>
+          </div>
+          <div class="mb-3" *ngIf="selectedUser.role === 'Docteur'">
+            <input type="text" class="form-control" name="specialite" [(ngModel)]="selectedUser.specialite" placeholder="Spécialité">
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+            <button type="submit" class="btn btn-primary">Sauvegarder</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+

@@ -1,0 +1,83 @@
+*{
+    box-sizing: border-box;
+    
+}
+.login{
+    width: 100%;
+    min-height: 100vh;
+    overflow: hidden;
+    border-radius: 5px;
+    display: flex;
+    
+}
+.content{
+    flex-basis: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    background: #CE50FF;
+    transition: 0.5s;
+}
+.content img{
+    width: 100%;
+}
+.loginform{
+    flex-basis: 50%;
+    background: white;
+    font-family: roboto;
+    padding: 25px;
+    display: flex; 
+    flex-direction: column; 
+    justify-content: center;
+}
+.loginform h1{
+    text-align: center;
+    margin-top: 0;
+    font-size: 2.5em;
+    margin-bottom: 20px;
+}
+.tbox{
+    border-radius: 15px;
+    background: transparent;
+    outline: none;
+    border: 1px solid #CE50FF;
+    width: 90%;
+    height: 45px;
+    margin: 30px 0;
+}
+.tbox input{
+    margin-top: 10px;
+    background: transparent;
+    width: 90%;
+    outline: none;
+    border: 0;
+    padding-left: 5px;
+}
+::placeholder{
+    color: #777;
+}
+.tbox i{
+    color: #CE50FF;
+    font-size: 19px;
+    padding: 9px;
+}
+.btnc{
+    text-align: center;
+}
+.btn{
+    width: 55%;
+    border: 0;
+    border-radius: 10px;
+    background: #CE50FF;
+    color: #fff;
+    padding: 12px;
+    font-size: 18px;
+    font-weight: bold;
+}
+@media(max-width:768px){
+    .login{
+        flex-direction: column;
+        margin: 0 15px;
+    }
+}
